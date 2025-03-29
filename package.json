@@ -1,0 +1,13 @@
+{
+  "name": "electron-timer-app",
+  "version": "1.0.0",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "package": "electron-packager . --plataform=win32 --arch=x64 --out=dist" 
+  },
+  "devDependencies": {
+    "electron": "^35.0.3",
+    "electron-packager": "^17.1.2"
+  }
+}

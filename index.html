@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Cronómetro y Temporizador</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <audio id="alarm-sound" src="sfx/Digital alarm clock sound effect beeping sounds.mp3" preload="auto"></audio>
+</head>
+<body>
+    <h1>Cronometro</h1>
+    <div class="time-display" id="stopwatch">00:00:00</div>
+    <button id="startStopwatch">Iniciar</button>
+    <button id="pauseStopwatch" disabled>Pausar</button>
+    <button id="resetStopwatch">Resetear</button>
+    
+    <button id="useAsTimer" style="margin-top: 30px;">Usar como Temporizador</button>
+    
+    <h1>Temporizador</h1>
+    <div class="time-display" id="timer">00:00:00</div>
+    <button id="startTimer">Iniciar Temporizador</button>
+    <button id="stopTimer">Detener Temporizador</button>
+
+    <script>
+        // Cronómetro
+        let stopwatchRunning = false;
+        let stopwatchStartTime = 0;
+        let stopwatchElapsedTime = 0;
+        let stopwatchInterval;
+        
+        document.getElementById('startStopwatch').addEventListener('click', () => {
+            if (!stopwatchRunning) {
+                stopwatchStartTime = Date.now() - stopwatchElapsedTime;
+                stopwatchRunning = true;
+                document.getElementById('startStopwatch').disabled = true;
+                document.getElementById('pauseStopwatch').disabled = false;
+                
+                stopwatchInterval = setInterval(updateStopwatch, 1000);
+            }
+        });
+        
+        document.getElementById('pauseStopwatch').addEventListener('click', () => {
+            if (stopwatchRunning) {
+                stopwatchRunning = false;
+                clearInterval(stopwatchInterval);
+                document.getElementById('startStopwatch').disabled = false;
+                document.getElementById('pauseStopwatch').disabled = true;
+            }
+        });
+        
+        document.getElementById('resetStopwatch').addEventListener('click', () => {
+            stopwatchRunning = false;
+            clearInterval(stopwatchInterval);
+            stopwatchElapsedTime = 0;
+            document.getElementById('stopwatch').textContent = '00:00:00';
+            document.getElementById('startStopwatch').disabled = false;
+            document.getElementById('pauseStopwatch').disabled = true;
+        });
+        
+        function updateStopwatch() {
+            stopwatchElapsedTime = Date.now() - stopwatchStartTime;
+            document.getElementById('stopwatch').textContent = formatTime(stopwatchElapsedTime);
+        }
+        
+        // Temporizador
+        let timerTime = 0;
+        let timerInterval;
+        
+        document.getElementById('useAsTimer').addEventListener('click', () => {
+            timerTime = stopwatchElapsedTime;
+            document.getElementById('timer').textContent = formatTime(timerTime);
+        });
+        
+        document.getElementById('startTimer').addEventListener('click', () => {
+            if (timerTime > 0 && !timerInterval) {
+                let remainingTime = timerTime;
+                
+                timerInterval = setInterval(() => {
+                    remainingTime -= 1000;
+                    document.getElementById('timer').textContent = formatTime(remainingTime);
+                    
+                    if (remainingTime <= 0) {
+                        clearInterval(timerInterval);
+                        timerInterval = null;
+                        document.getElementById('timer').textContent = "¡Tiempo completado!";
+                        // Reproducir sonido
+                        const alarmSound = document.getElementById('alarm-sound');
+                        alarmSound.play();
+                    }
+                }, 1000);
+            }
+        });
+        
+        document.getElementById('stopTimer').addEventListener('click', () => {
+            if (timerInterval) {
+                clearInterval(timerInterval);
+                timerInterval = null;
+                document.getElementById('timer').textContent = formatTime(timerTime);
+            }
+        });
+        
+        function formatTime(ms) {
+            let total_seconds = Math.floor(ms / 1000);
+            let hours = Math.floor(total_seconds / 3600);
+            let minutes = Math.floor((total_seconds % 3600) / 60);
+            let seconds = total_seconds % 60;
+            
+            return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+        }
+    </script>
+</body>
+</html>
